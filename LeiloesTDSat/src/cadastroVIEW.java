@@ -1,3 +1,15 @@
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
@@ -140,7 +152,35 @@ public class cadastroVIEW extends javax.swing.JFrame {
     }//GEN-LAST:event_cadastroNomeActionPerformed
 
     private void btnCadastrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCadastrarActionPerformed
-        ProdutosDTO produto = new ProdutosDTO();
+ try {
+            // TODO add your handling code here:
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(TelaCadastro.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        SimpleDateFormat formatoEntrada = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat formatoMySQL = new SimpleDateFormat("yyyy-MM-dd");
+        Date dataFormatada = null;
+        try {
+            dataFormatada = formatoEntrada.parse(txtDataLancamento.getText());
+        } catch (ParseException ex) {
+            Logger.getLogger(TelaCadastro.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        String dataParaBanco = formatoMySQL.format(dataFormatada);
+        try (
+            
+                
+                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/cenaflix_db", "root", "Andrecararo1"); PreparedStatement stmt = conn.prepareStatement("INSERT INTO filmes (nome, datalancamento, categoria) VALUES (?, ?, ?)")) {
+            stmt.setString(1, txtNome.getText());
+            stmt.setString(2, dataParaBanco);
+            stmt.setString(3, txtCategoria.getText());
+            stmt.executeUpdate();
+            JOptionPane.showMessageDialog(null, "Filme inserido com sucesso!");
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao inserir filme: " + e.getMessage());
+        }
+        
+        /*        ProdutosDTO produto = new ProdutosDTO();
         String nome = cadastroNome.getText();
         String valor = cadastroValor.getText();
         String status = "A Venda";
@@ -150,7 +190,7 @@ public class cadastroVIEW extends javax.swing.JFrame {
         
         ProdutosDAO produtodao = new ProdutosDAO();
         produtodao.cadastrarProduto(produto);
-        
+        */
     }//GEN-LAST:event_btnCadastrarActionPerformed
 
     private void btnProdutosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProdutosActionPerformed
